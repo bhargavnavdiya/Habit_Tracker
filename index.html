@@ -11,13 +11,12 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- Sidebar Navigation -->
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
+        <header class="app-header">
+            <div class="brand-block">
                 <h1 class="logo">✨ Habit Tracker</h1>
                 <p class="tagline">Build better habits, one day at a time</p>
             </div>
+            <div class="spacer"></div>
             <nav class="nav-menu">
                 <button class="nav-item active" data-view="monthly">
                     <span class="nav-icon">📅</span>
@@ -32,8 +31,7 @@
                     <span>Settings</span>
                 </button>
             </nav>
-        </aside>
-        <button class="sidebar-fab" id="sidebar-fab">☰</button>
+        </header>
 
         <!-- Main Content -->
         <main class="main-content">
@@ -93,6 +91,13 @@
                 <!-- Mental State Section -->
                 <div class="mental-state-section">
                     <h3>Mental State</h3>
+                    <p class="mental-state-description">
+                        Log your mood and motivation from 1 (low) to 10 (high) for each day. Columns follow the calendar order shown below, so you can quickly spot how you felt throughout the month.
+                    </p>
+                    <div class="mental-state-legend">
+                        <span class="mental-state-pill mood">Mood (1-10)</span>
+                        <span class="mental-state-pill motivation">Motivation (1-10)</span>
+                    </div>
                     <div class="mental-state-grid-wrapper">
                         <div class="mental-state-grid" id="mental-state-grid"></div>
                     </div>

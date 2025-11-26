@@ -6,6 +6,8 @@ class HabitTracker {
         this.data = this.loadData();
         this.charts = {};
         this.useBackend = false; // Set to true if backend is available
+        this.trackerResizeHandler = null;
+        this.mentalStateResizeHandler = null;
         this.init();
     }
 
@@ -137,12 +139,13 @@ class HabitTracker {
     }
 
     setupEventListeners() {
-        // Sidebar toggle
+        // Sidebar toggle (legacy support)
         const sidebarToggle = document.getElementById('sidebar-toggle');
         const sidebar = document.getElementById('sidebar');
         const sidebarFab = document.getElementById('sidebar-fab');
 
         const setMobileSidebarState = (isOpen) => {
+            if (!sidebar) return;
             if (isOpen) {
                 document.body.classList.add('mobile-sidebar-open');
             } else {
@@ -150,7 +153,7 @@ class HabitTracker {
             }
         };
 
-        if (sidebarToggle) {
+        if (sidebar && sidebarToggle) {
             sidebarToggle.addEventListener('click', () => {
                 if (window.innerWidth <= 768) {
                     const isActive = sidebar.classList.toggle('active');
@@ -161,7 +164,7 @@ class HabitTracker {
             });
         }
 
-        if (sidebarFab) {
+        if (sidebar && sidebarFab) {
             sidebarFab.addEventListener('click', () => {
                 if (window.innerWidth <= 768) {
                     sidebar.classList.add('active');
@@ -172,22 +175,23 @@ class HabitTracker {
             });
         }
 
-        // Close sidebar when clicking outside on mobile
-        document.addEventListener('click', (e) => {
-            const clickedToggle = sidebarToggle && sidebarToggle.contains(e.target);
-            const clickedFab = sidebarFab && sidebarFab.contains(e.target);
-            if (window.innerWidth <= 768 && !sidebar.contains(e.target) && !clickedToggle && !clickedFab) {
-                sidebar.classList.remove('active');
-                setMobileSidebarState(false);
-            }
-        });
+        if (sidebar) {
+            document.addEventListener('click', (e) => {
+                const clickedToggle = sidebarToggle && sidebarToggle.contains(e.target);
+                const clickedFab = sidebarFab && sidebarFab.contains(e.target);
+                if (window.innerWidth <= 768 && !sidebar.contains(e.target) && !clickedToggle && !clickedFab) {
+                    sidebar.classList.remove('active');
+                    setMobileSidebarState(false);
+                }
+            });
+        }
 
         // Navigation
         document.querySelectorAll('.nav-item').forEach(item => {
             item.addEventListener('click', (e) => {
                 const view = e.currentTarget.dataset.view;
                 this.switchView(view);
-                if (window.innerWidth <= 768) {
+                if (window.innerWidth <= 768 && sidebar) {
                     sidebar.classList.remove('active');
                     setMobileSidebarState(false);
                 }
@@ -358,6 +362,8 @@ class HabitTracker {
             const isPast = this.isPastDate(date);
             const isFuture = this.isFutureDate(date);
             const dayClasses = ['day-header'];
+            const weekShadeClass = `week-shade-${(Math.floor((day - 1) / 7) % 4) + 1}`;
+            dayClasses.push(weekShadeClass);
             if (isToday) dayClasses.push('today');
             if (isPast) dayClasses.push('past');
             if (isFuture) dayClasses.push('future');
@@ -378,6 +384,8 @@ class HabitTracker {
                 const isPast = this.isPastDate(date);
                 const isFuture = this.isFutureDate(date);
                 const checkboxClasses = ['habit-checkbox'];
+                const weekShadeClass = `week-shade-${(Math.floor((day - 1) / 7) % 4) + 1}`;
+                checkboxClasses.push(weekShadeClass);
                 if (isChecked) checkboxClasses.push('checked');
                 if (isToday) checkboxClasses.push('today');
                 if (isPast) checkboxClasses.push('past');
@@ -394,6 +402,42 @@ class HabitTracker {
         });
 
         grid.innerHTML = html;
+        this.adjustTrackerGridLayout(daysInMonth);
+        if (!this.trackerResizeHandler) {
+            this.trackerResizeHandler = () => {
+                const currentYear = this.currentDate.getFullYear();
+                const currentMonth = this.currentDate.getMonth();
+                const currentDays = this.getDaysInMonth(currentYear, currentMonth);
+                this.adjustTrackerGridLayout(currentDays);
+            };
+            window.addEventListener('resize', this.trackerResizeHandler);
+        }
+    }
+
+    adjustTrackerGridLayout(daysInMonth) {
+        const wrapper = document.querySelector('.tracker-grid');
+        if (!wrapper) return;
+
+        const sections = wrapper.querySelectorAll('.grid-week-row, .grid-header, .grid-row');
+        if (!sections.length) return;
+
+        const containerWidth = wrapper.clientWidth || wrapper.parentElement?.clientWidth || window.innerWidth;
+        const sample = sections[0];
+        const computedStyles = window.getComputedStyle(sample);
+        const gap = parseFloat(computedStyles.columnGap) || parseFloat(computedStyles.gap) || 8;
+        const totalGaps = Math.max(0, daysInMonth * gap);
+        const labelWidth = Math.min(220, Math.max(140, containerWidth * 0.18));
+        const paddingBuffer = 32; // account for inner padding/margins
+        const availableWidth = containerWidth - labelWidth - totalGaps - paddingBuffer;
+        const rawDayWidth = availableWidth / Math.max(1, daysInMonth);
+        const dayWidth = Number.isFinite(rawDayWidth)
+            ? Math.max(22, Math.min(42, rawDayWidth))
+            : 30;
+        const template = `${labelWidth}px repeat(${daysInMonth}, ${dayWidth}px)`;
+
+        sections.forEach(section => {
+            section.style.gridTemplateColumns = template;
+        });
     }
 
     isHabitCompleted(dateKey, habitId) {
@@ -606,7 +650,39 @@ class HabitTracker {
         html += '</div>';
 
         grid.innerHTML = html;
+        this.adjustMentalStateGridLayout(daysInMonth);
+        if (!this.mentalStateResizeHandler) {
+            this.mentalStateResizeHandler = () => {
+                const currentYear = this.currentDate.getFullYear();
+                const currentMonth = this.currentDate.getMonth();
+                const currentDays = this.getDaysInMonth(currentYear, currentMonth);
+                this.adjustMentalStateGridLayout(currentDays);
+            };
+            window.addEventListener('resize', this.mentalStateResizeHandler);
+        }
         this.renderMentalStateChart(year, month);
+    }
+
+    adjustMentalStateGridLayout(daysInMonth) {
+        const grid = document.getElementById('mental-state-grid');
+        const wrapper = document.querySelector('.mental-state-grid-wrapper');
+        if (!grid || !wrapper) return;
+
+        const wrapperWidth = wrapper.clientWidth || grid.parentElement?.clientWidth || window.innerWidth;
+        const computedStyles = window.getComputedStyle(grid);
+        const gap = parseFloat(computedStyles.gap) || 8;
+        const totalGaps = Math.max(0, daysInMonth * gap);
+        const labelWidth = Math.min(160, Math.max(115, wrapperWidth * 0.1));
+        const paddingBuffer = 24;
+        const availableWidth = wrapperWidth - labelWidth - totalGaps - paddingBuffer;
+        const rawDayWidth = availableWidth / Math.max(1, daysInMonth);
+        const dayWidth = Number.isFinite(rawDayWidth)
+            ? Math.max(22, Math.min(52, rawDayWidth))
+            : 28;
+
+        const template = `${labelWidth}px repeat(${daysInMonth}, minmax(${dayWidth}px, 1fr))`;
+        grid.style.gridTemplateColumns = template;
+        wrapper.scrollLeft = 0;
     }
 
     updateMentalState(dateKey, type, value) {
@@ -722,7 +798,7 @@ class HabitTracker {
         const daysInMonth = this.getDaysInMonth(year, month);
         const table = document.getElementById('analysis-table');
         
-        let html = '<div class="analysis-row">';
+        let html = '<div class="analysis-row analysis-header">';
         html += '<div>Habit</div><div>Goal</div><div>Actual</div><div>Progress</div>';
         html += '</div>';
 
@@ -744,7 +820,8 @@ class HabitTracker {
             html += `<div class="analysis-goal">${goal}</div>`;
             html += `<div class="analysis-actual">${completed}</div>`;
             html += `<div class="analysis-progress">`;
-            html += `<div class="analysis-progress-bar" style="width: ${progress}%">${progress.toFixed(0)}%</div>`;
+            html += `<div class="analysis-progress-bar" style="width: ${progress}%"></div>`;
+            html += `<span class="analysis-progress-value">${progress.toFixed(0)}%</span>`;
             html += `</div>`;
             html += '</div>';
         });
@@ -752,34 +829,35 @@ class HabitTracker {
         table.innerHTML = html;
     }
 
-    renderYearlyView() {
-        const year = this.currentDate.getFullYear();
-        document.getElementById('current-year').textContent = year;
-        
-        const monthlyData = [];
-        const labels = ['Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'];
-        
-        // Calculate data for each month (Nov of previous year to Oct of current year)
-        for (let i = 0; i < 12; i++) {
-            let monthYear = year;
-            let month = (11 + i) % 12; // Start from November (11)
-            if (i < 2) monthYear = year - 1; // Nov, Dec are previous year
-            
-            const daysInMonth = this.getDaysInMonth(monthYear, month);
+    calculateMonthlyProgress(year) {
+        const stats = [];
+        for (let month = 0; month < 12; month++) {
+            const daysInMonth = this.getDaysInMonth(year, month);
             let totalCompleted = 0;
             let totalPossible = this.habits.length * daysInMonth;
-            
+
             for (let day = 1; day <= daysInMonth; day++) {
-                const date = new Date(monthYear, month, day);
+                const date = new Date(year, month, day);
                 const dateKey = this.getDateKey(date);
                 if (this.data[dateKey] && this.data[dateKey].habits) {
                     totalCompleted += this.data[dateKey].habits.length;
                 }
             }
-            
+
             const progress = totalPossible > 0 ? (totalCompleted / totalPossible) * 100 : 0;
-            monthlyData.push(progress);
+            stats.push({ month, totalCompleted, totalPossible, progress });
         }
+        return stats;
+    }
+
+    renderYearlyView() {
+        const year = this.currentDate.getFullYear();
+        document.getElementById('current-year').textContent = year;
+        
+        const monthStats = this.calculateMonthlyProgress(year);
+        const monthlyData = monthStats.map(stat => stat.progress);
+        const labels = monthStats.map(stat => new Date(year, stat.month, 1)
+            .toLocaleDateString('en-US', { month: 'short' }));
 
         // Render chart
         const ctx = document.getElementById('yearly-chart');
@@ -851,48 +929,33 @@ class HabitTracker {
         });
 
         // Render monthly stats grid
-        this.renderMonthlyStatsGrid(year, monthlyData, labels);
+        this.renderMonthlyStatsGrid(year, monthStats);
     }
 
-    renderMonthlyStatsGrid(year, monthlyData, labels) {
+    renderMonthlyStatsGrid(year, monthStats) {
         const grid = document.getElementById('monthly-stats-grid');
-        const monthNames = ['November', 'December', 'January', 'February', 'March', 'April',
-                           'May', 'June', 'July', 'August', 'September', 'October'];
         
         let html = '';
         
-        for (let i = 0; i < 12; i++) {
-            let monthYear = year;
-            let month = (11 + i) % 12;
-            if (i < 2) monthYear = year - 1;
-            
-            const daysInMonth = this.getDaysInMonth(monthYear, month);
-            let totalCompleted = 0;
-            
-            for (let day = 1; day <= daysInMonth; day++) {
-                const date = new Date(monthYear, month, day);
-                const dateKey = this.getDateKey(date);
-                if (this.data[dateKey] && this.data[dateKey].habits) {
-                    totalCompleted += this.data[dateKey].habits.length;
-                }
-            }
-            
+        monthStats.forEach(stat => {
+            const monthName = new Date(year, stat.month, 1)
+                .toLocaleDateString('en-US', { month: 'long' });
             html += '<div class="month-stat-card">';
-            html += `<h4>${monthNames[i]}</h4>`;
+            html += `<h4>${monthName}</h4>`;
             html += '<div class="stat-item">';
             html += '<span class="stat-label">Number of Habits:</span>';
             html += `<span class="stat-value">${this.habits.length}</span>`;
             html += '</div>';
             html += '<div class="stat-item">';
-            html += '<span class="stat-label">Completed:</span>';
-            html += `<span class="stat-value">${totalCompleted}</span>`;
+            html += '<span class="stat-label">Check-ins Logged:</span>';
+            html += `<span class="stat-value">${stat.totalCompleted}</span>`;
             html += '</div>';
             html += '<div class="stat-item">';
             html += '<span class="stat-label">Progress:</span>';
-            html += `<span class="stat-value">${monthlyData[i].toFixed(2)}%</span>`;
+            html += `<span class="stat-value">${stat.progress.toFixed(1)}%</span>`;
             html += '</div>';
             html += '</div>';
-        }
+        });
         
         grid.innerHTML = html;
     }

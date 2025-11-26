@@ -4,6 +4,11 @@
       "id": 1,
       "name": "Wakeup at 5:00",
       "emoji": "⏰"
+    },
+    {
+      "id": 2,
+      "name": "Excersize",
+      "emoji": "🤸"
     }
   ],
   "data": {
@@ -61,7 +66,8 @@
     },
     "2025-11-18": {
       "habits": [
-        1
+        1,
+        2
       ],
       "mood": null,
       "motivation": null
@@ -72,7 +78,9 @@
       "motivation": null
     },
     "2025-11-10": {
-      "habits": [],
+      "habits": [
+        2
+      ],
       "mood": null,
       "motivation": 4
     },
@@ -124,6 +132,99 @@
     "2025-09-17": {
       "habits": [
         1
+      ],
+      "mood": null,
+      "motivation": null
+    },
+    "2025-07-06": {
+      "habits": [],
+      "mood": null,
+      "motivation": null
+    },
+    "2025-10-19": {
+      "habits": [],
+      "mood": null,
+      "motivation": null
+    },
+    "2025-10-21": {
+      "habits": [],
+      "mood": null,
+      "motivation": null
+    },
+    "2025-10-05": {
+      "habits": [],
+      "mood": 3,
+      "motivation": 6
+    },
+    "2025-10-07": {
+      "habits": [],
+      "mood": 5,
+      "motivation": 4
+    },
+    "2025-10-06": {
+      "habits": [],
+      "mood": 4,
+      "motivation": 5
+    },
+    "2025-10-08": {
+      "habits": [
+        1
+      ],
+      "mood": null,
+      "motivation": null
+    },
+    "2025-10-09": {
+      "habits": [
+        1
+      ],
+      "mood": null,
+      "motivation": null
+    },
+    "2025-10-11": {
+      "habits": [
+        1
+      ],
+      "mood": null,
+      "motivation": null
+    },
+    "2025-10-10": {
+      "habits": [
+        1
+      ],
+      "mood": null,
+      "motivation": null
+    },
+    "2025-10-12": {
+      "habits": [
+        1
+      ],
+      "mood": null,
+      "motivation": null
+    },
+    "2025-10-15": {
+      "habits": [
+        1
+      ],
+      "mood": null,
+      "motivation": null
+    },
+    "2025-10-17": {
+      "habits": [
+        1
+      ],
+      "mood": null,
+      "motivation": null
+    },
+    "2025-11-07": {
+      "habits": [
+        2
+      ],
+      "mood": null,
+      "motivation": null
+    },
+    "2025-11-22": {
+      "habits": [
+        2
       ],
       "mood": null,
       "motivation": null
