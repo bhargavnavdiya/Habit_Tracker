@@ -19,6 +19,8 @@
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     --radius: 12px;
     --radius-sm: 8px;
+    --ambient-start: #fdf2f8;
+    --ambient-end: #e0f2fe;
 }
 
 * {
@@ -29,16 +31,22 @@
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: var(--bg);
+    background: linear-gradient(180deg, var(--ambient-start), var(--ambient-end));
     color: var(--text);
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
 }
 
 
 .app-container {
     min-height: 100vh;
     padding: 2rem;
+    background:
+        radial-gradient(circle at 15% 0%, var(--ambient-start), transparent 55%),
+        radial-gradient(circle at 85% 20%, var(--ambient-end), transparent 60%),
+        radial-gradient(circle at 50% 80%, rgba(255,255,255,0.4), transparent 65%),
+        linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.95));
 }
 
 .app-header {
@@ -217,6 +225,121 @@ body {
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 1.5rem;
     margin-bottom: 2rem;
+}
+
+.motivation-banner {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+}
+
+.motivation-card {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(99, 102, 241, 0.25));
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.motivation-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: -30%;
+    width: 60%;
+    height: 100%;
+    background: radial-gradient(circle at top, rgba(255,255,255,0.35), transparent 60%);
+    opacity: 0.7;
+}
+
+.motivation-card-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.35rem;
+    position: relative;
+    z-index: 1;
+}
+
+.motivation-card-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.motivation-card .motivation-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.motivation-card .motivation-value {
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: var(--text);
+    position: relative;
+    z-index: 1;
+}
+
+.motivation-card.milestone {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.35));
+    border-color: rgba(16, 185, 129, 0.2);
+}
+
+.motivation-card .motivation-helper {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    position: relative;
+    z-index: 1;
+}
+
+.reflection-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 1.75rem;
+    margin-bottom: 2rem;
+}
+
+.reflection-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.reflection-header h4 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.reflection-status {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--primary);
+    background: rgba(99, 102, 241, 0.12);
+    padding: 0.25rem 0.85rem;
+    border-radius: 999px;
+}
+
+.reflection-card p {
+    color: var(--text-light);
+    font-size: 0.95rem;
 }
 
 .summary-card {
@@ -556,6 +679,54 @@ body {
     overflow-x: visible;
 }
 
+.mental-state-top {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+}
+
+.mental-state-copy {
+    flex: 1 1 300px;
+}
+
+.mood-sparkline-card {
+    flex: 0 0 280px;
+    background: var(--surface-hover);
+    border-radius: var(--radius);
+    border: 1px dashed var(--border);
+    padding: 1rem;
+    box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.2);
+}
+
+.sparkline-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.sparkline-label {
+    font-weight: 600;
+    color: var(--text);
+}
+
+.sparkline-range {
+    font-size: 0.85rem;
+    color: var(--text-light);
+}
+
+#mood-sparkline {
+    height: 120px;
+}
+
+.sparkline-helper {
+    font-size: 0.8rem;
+    color: var(--text-light);
+    margin-top: 0.5rem;
+}
+
 .chart-section h3,
 .mental-state-section h3 {
     font-size: 1.5rem;
@@ -573,6 +744,7 @@ body {
 .mental-state-grid-wrapper {
     width: 100%;
     overflow-x: auto;
+    position: relative;
 }
 
 .mental-state-grid {
@@ -615,7 +787,11 @@ body {
     left: 0;
     background: var(--surface);
     box-shadow: 8px 0 16px rgba(15, 23, 42, 0.05);
-    z-index: 1;
+    z-index: 5;
+}
+
+.mental-state-header .mental-state-label {
+    z-index: 6;
 }
 
 .mental-state-select {
@@ -757,6 +933,158 @@ body {
     box-shadow: var(--shadow);
     margin-bottom: 2rem;
     border: 1px solid var(--border);
+}
+
+.yearly-momentum {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.best-month-card {
+    flex: 0 0 260px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 1.5rem;
+}
+
+.best-month-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+}
+
+.best-month-card h4 {
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.best-month-score {
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+}
+
+.best-month-helper {
+    font-size: 0.85rem;
+    color: var(--text-light);
+}
+
+.momentum-strip {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.75rem;
+}
+
+.momentum-chip {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.85rem;
+    box-shadow: var(--shadow);
+}
+
+.momentum-chip .chip-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: var(--text-light);
+    margin-bottom: 0.5rem;
+}
+
+.momentum-chip .chip-bar {
+    height: 8px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: var(--border);
+    margin-bottom: 0.4rem;
+}
+
+.momentum-chip .chip-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+}
+
+.momentum-chip .chip-status {
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.yearly-achievement-section {
+    background: var(--surface);
+    padding: 2rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 3rem;
+    border: 1px solid var(--border);
+}
+
+.achievement-carousel {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    padding-bottom: 1rem;
+}
+
+.achievement-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+}
+
+.achievement-card.unlocked {
+    border-color: rgba(16, 185, 129, 0.4);
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.15);
+}
+
+.achievement-icon {
+    font-size: 2rem;
+}
+
+.achievement-body {
+    flex: 1;
+}
+
+.achievement-title {
+    font-weight: 600;
+    color: var(--text);
+}
+
+.achievement-desc {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    margin-bottom: 0.75rem;
+}
+
+.achievement-progress {
+    width: 100%;
+    height: 8px;
+    background: var(--border);
+    border-radius: 999px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.achievement-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+}
+
+.achievement-progress-label {
+    font-size: 0.85rem;
+    color: var(--text-light);
 }
 
 .monthly-stats-grid {

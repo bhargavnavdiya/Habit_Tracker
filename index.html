@@ -49,6 +49,41 @@
                     </div>
                 </div>
 
+                <!-- Motivation Banner -->
+                <div class="motivation-banner" id="motivation-banner">
+                    <div class="motivation-card">
+                        <div class="motivation-card-heading">
+                            <span class="motivation-card-icon">🔥</span>
+                            <p class="motivation-label">Current Streak</p>
+                        </div>
+                        <p class="motivation-value" id="current-streak">0 days</p>
+                    </div>
+                    <div class="motivation-card">
+                        <div class="motivation-card-heading">
+                            <span class="motivation-card-icon">🏆</span>
+                            <p class="motivation-label">Longest Streak</p>
+                        </div>
+                        <p class="motivation-value" id="longest-streak">0 days</p>
+                    </div>
+                    <div class="motivation-card milestone">
+                        <div class="motivation-card-heading">
+                            <span class="motivation-card-icon">🎯</span>
+                            <p class="motivation-label" id="milestone-label">Next Milestone</p>
+                        </div>
+                        <p class="motivation-value" id="next-milestone">–</p>
+                        <p class="motivation-helper" id="milestone-helper">Log habits to start a streak!</p>
+                    </div>
+                </div>
+
+                <!-- Achievements -->
+                <div class="achievement-section">
+                    <div class="section-header">
+                        <h3>Milestone Badges</h3>
+                        <p class="section-subtitle" id="achievement-summary">Keep logging to unlock badges</p>
+                    </div>
+                    <div class="achievement-carousel" id="achievement-carousel"></div>
+                </div>
+
                 <!-- Summary Cards -->
                 <div class="summary-cards">
                     <div class="summary-card">
@@ -104,6 +139,14 @@
                     <canvas id="mental-state-chart"></canvas>
                 </div>
 
+                <div class="reflection-card">
+                    <div class="reflection-header">
+                        <h4>Daily Reflection</h4>
+                        <span class="reflection-status" id="reflection-status">Awaiting entry</span>
+                    </div>
+                    <p id="reflection-prompt">Log today’s mood and motivation to receive a tailored reflection.</p>
+                </div>
+
                 <!-- Analysis Section -->
                 <div class="analysis-section">
                     <h3>Habit Analysis</h3>
@@ -123,6 +166,15 @@
                 </div>
                 <div class="yearly-chart-container">
                     <canvas id="yearly-chart"></canvas>
+                </div>
+                <div class="yearly-momentum">
+                    <div class="best-month-card" id="best-month-card">
+                        <p class="best-month-label">Best Month</p>
+                        <h4 id="best-month-name">—</h4>
+                        <p class="best-month-score"><span id="best-month-score">0%</span> completion</p>
+                        <p class="best-month-helper" id="best-month-helper">Log habits to unlock highlights.</p>
+                    </div>
+                    <div class="momentum-strip" id="monthly-momentum-strip"></div>
                 </div>
                 <div class="monthly-stats-grid" id="monthly-stats-grid"></div>
             </div>

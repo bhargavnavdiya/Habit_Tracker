@@ -8,6 +8,7 @@ class HabitTracker {
         this.useBackend = false; // Set to true if backend is available
         this.trackerResizeHandler = null;
         this.mentalStateResizeHandler = null;
+        this.achievements = this.getAchievementDefinitions();
         this.init();
     }
 
@@ -28,6 +29,72 @@ class HabitTracker {
         } catch (error) {
             console.log('Backend not available, using localStorage');
         }
+    }
+
+    getAchievementDefinitions() {
+        return [
+            { id: 'streak_3', icon: '🔥', title: 'On a Roll', description: 'Maintain a 3 day streak', criteria: { type: 'streak', value: 3 } },
+            { id: 'streak_7', icon: '⚡', title: 'Momentum Master', description: 'Maintain a 7 day streak', criteria: { type: 'streak', value: 7 } },
+            { id: 'completion_75', icon: '📈', title: 'Consistency Champ', description: 'Reach 75% completion this month', criteria: { type: 'monthly_completion', value: 75 } },
+            { id: 'completion_100', icon: '🏅', title: 'Perfect Month', description: 'Reach 100% completion', criteria: { type: 'monthly_completion', value: 100 } },
+            { id: 'habit_8', icon: '🧱', title: 'Habit Architect', description: 'Track at least 8 habits', criteria: { type: 'habit_count', value: 8 } }
+        ];
+    }
+
+    getAchievementMetrics(year, month) {
+        const { current, longest } = this.calculateStreaks();
+        const monthlyCompletion = this.getMonthCompletionPercent(year, month);
+        return {
+            currentStreak: current,
+            longestStreak: longest,
+            monthlyCompletion,
+            habitCount: this.habits.length
+        };
+    }
+
+    getAchievementProgress(achievement, metrics) {
+        const { type, value } = achievement.criteria;
+        let progress = 0;
+        if (type === 'streak') {
+            progress = Math.min(100, (metrics.longestStreak / value) * 100);
+        } else if (type === 'monthly_completion') {
+            progress = Math.min(100, (metrics.monthlyCompletion / value) * 100);
+        } else if (type === 'habit_count') {
+            progress = Math.min(100, (metrics.habitCount / value) * 100);
+        }
+        return progress;
+    }
+
+    renderAchievements(year, month) {
+        const container = document.getElementById('achievement-carousel');
+        const summaryEl = document.getElementById('achievement-summary');
+        if (!container || !summaryEl) return;
+
+        const metrics = this.getAchievementMetrics(year, month);
+        let unlockedCount = 0;
+        const cards = this.achievements.map(achievement => {
+            const progress = this.getAchievementProgress(achievement, metrics);
+            const unlocked = progress >= 100;
+            if (unlocked) unlockedCount++;
+            return `
+                <div class="achievement-card ${unlocked ? 'unlocked' : 'locked'}">
+                    <div class="achievement-icon">${achievement.icon}</div>
+                    <div class="achievement-body">
+                        <p class="achievement-title">${achievement.title}</p>
+                        <p class="achievement-desc">${achievement.description}</p>
+                        <div class="achievement-progress">
+                            <div class="achievement-progress-bar" style="width: ${progress}%"></div>
+                        </div>
+                        <p class="achievement-progress-label">${Math.min(100, progress).toFixed(0)}%</p>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        container.innerHTML = cards;
+        summaryEl.textContent = unlockedCount > 0
+            ? `${unlockedCount} badge${unlockedCount === 1 ? '' : 's'} unlocked`
+            : 'Keep logging to unlock badges';
     }
 
     async loadDataFromBackend() {
@@ -293,6 +360,7 @@ class HabitTracker {
         });
     }
 
+
     updateMonthPicker() {
         const year = this.currentDate.getFullYear();
         const month = String(this.currentDate.getMonth() + 1).padStart(2, '0');
@@ -325,9 +393,12 @@ class HabitTracker {
         this.updateMonthPicker();
         this.renderTrackerGrid(year, month);
         this.updateSummary();
+        this.updateMotivationBanner();
         this.renderCharts(year, month);
         this.renderMentalState(year, month);
         this.renderAnalysis();
+        this.renderAchievements(year, month);
+        this.updateReflectionCard();
     }
 
     getDaysInMonth(year, month) {
@@ -426,13 +497,17 @@ class HabitTracker {
         const computedStyles = window.getComputedStyle(sample);
         const gap = parseFloat(computedStyles.columnGap) || parseFloat(computedStyles.gap) || 8;
         const totalGaps = Math.max(0, daysInMonth * gap);
-        const labelWidth = Math.min(220, Math.max(140, containerWidth * 0.18));
+        const minLabelWidth = 160;
+        const maxLabelWidth = 240;
+        const labelWidth = Math.min(maxLabelWidth, Math.max(minLabelWidth, containerWidth * 0.2));
         const paddingBuffer = 32; // account for inner padding/margins
         const availableWidth = containerWidth - labelWidth - totalGaps - paddingBuffer;
         const rawDayWidth = availableWidth / Math.max(1, daysInMonth);
+        const minDayWidth = 32;
+        const maxDayWidth = 48;
         const dayWidth = Number.isFinite(rawDayWidth)
-            ? Math.max(22, Math.min(42, rawDayWidth))
-            : 30;
+            ? Math.max(minDayWidth, Math.min(maxDayWidth, rawDayWidth))
+            : minDayWidth;
         const template = `${labelWidth}px repeat(${daysInMonth}, ${dayWidth}px)`;
 
         sections.forEach(section => {
@@ -500,6 +575,123 @@ class HabitTracker {
         const progressLabel = document.getElementById('progress-bar-label');
         if (progressLabel) {
             progressLabel.textContent = `${todaysProgress.toFixed(0)}%`;
+        }
+
+        this.updateAmbientTheme(todaysProgress);
+    }
+
+    updateAmbientTheme(progressValue) {
+        const root = document.documentElement;
+        if (!root) return;
+
+        const clamped = Math.max(0, Math.min(100, progressValue || 0));
+        const hueStart = 10 + (clamped / 100) * 70; // transitions from warm to cool
+        const hueEnd = hueStart + 30;
+        const startColor = `hsl(${hueStart}, 75%, 92%)`;
+        const endColor = `hsl(${hueEnd}, 80%, 85%)`;
+
+        root.style.setProperty('--ambient-start', startColor);
+        root.style.setProperty('--ambient-end', endColor);
+    }
+
+    getMonthCompletionPercent(year, month) {
+        const daysInMonth = this.getDaysInMonth(year, month);
+        if (!this.habits.length || daysInMonth === 0) return 0;
+
+        let totalCompleted = 0;
+        for (let day = 1; day <= daysInMonth; day++) {
+            const date = new Date(year, month, day);
+            const dateKey = this.getDateKey(date);
+            if (this.data[dateKey] && this.data[dateKey].habits) {
+                totalCompleted += this.data[dateKey].habits.length;
+            }
+        }
+
+        const totalPossible = this.habits.length * daysInMonth;
+        return totalPossible > 0 ? (totalCompleted / totalPossible) * 100 : 0;
+    }
+
+    isDayComplete(dateKey) {
+        if (!this.habits.length) return false;
+        const completedCount = this.data[dateKey]?.habits?.length || 0;
+        return completedCount === this.habits.length;
+    }
+
+    calculateStreaks(referenceDate = new Date()) {
+        const normalizedReference = this.normalizeDate(referenceDate);
+        const dateKeys = Object.keys(this.data).sort();
+        let longestStreak = 0;
+        let rollingStreak = 0;
+
+        dateKeys.forEach(key => {
+            const date = this.parseDateKey(key);
+            if (date > normalizedReference) {
+                return;
+            }
+            if (this.isDayComplete(key)) {
+                rollingStreak++;
+                longestStreak = Math.max(longestStreak, rollingStreak);
+            } else {
+                rollingStreak = 0;
+            }
+        });
+
+        let currentStreak = 0;
+        let cursor = new Date(normalizedReference);
+        while (!this.isFutureDate(cursor)) {
+            const key = this.getDateKey(cursor);
+            if (this.isDayComplete(key)) {
+                currentStreak++;
+                cursor.setDate(cursor.getDate() - 1);
+            } else {
+                break;
+            }
+        }
+
+        return { current: currentStreak, longest: longestStreak };
+    }
+
+    getNextMilestone(currentStreak) {
+        const milestones = [3, 7, 14, 21, 30, 45, 60, 90, 120];
+        return milestones.find(milestone => milestone > currentStreak);
+    }
+
+    updateMotivationBanner() {
+        const currentStreakEl = document.getElementById('current-streak');
+        const longestStreakEl = document.getElementById('longest-streak');
+        const milestoneLabelEl = document.getElementById('milestone-label');
+        const nextMilestoneEl = document.getElementById('next-milestone');
+        const milestoneHelperEl = document.getElementById('milestone-helper');
+
+        if (!currentStreakEl || !longestStreakEl || !milestoneLabelEl || !nextMilestoneEl || !milestoneHelperEl) {
+            return;
+        }
+
+        if (!this.habits.length) {
+            currentStreakEl.textContent = '0 days';
+            longestStreakEl.textContent = '0 days';
+            milestoneLabelEl.textContent = 'Add habits to begin';
+            nextMilestoneEl.textContent = '—';
+            milestoneHelperEl.textContent = 'Start by creating your first habit.';
+            return;
+        }
+
+        const { current, longest } = this.calculateStreaks();
+        currentStreakEl.textContent = `${current} day${current === 1 ? '' : 's'}`;
+        longestStreakEl.textContent = `${longest} day${longest === 1 ? '' : 's'}`;
+
+        const nextMilestone = this.getNextMilestone(current);
+        if (nextMilestone) {
+            const daysAway = nextMilestone - current;
+            milestoneLabelEl.textContent = 'Next Milestone';
+            nextMilestoneEl.textContent = `${nextMilestone}-day streak`;
+            milestoneHelperEl.textContent = daysAway > 0
+                ? `${daysAway} day${daysAway === 1 ? '' : 's'} away`
+                : 'Right around the corner!';
+        } else {
+            milestoneLabelEl.textContent = 'Milestone Achieved';
+            nextMilestoneEl.textContent = 'Legend status';
+            milestoneHelperEl.textContent = 'Keep the momentum going!';
         }
     }
 
@@ -663,6 +855,44 @@ class HabitTracker {
         this.renderMentalStateChart(year, month);
     }
 
+    updateReflectionCard() {
+        const statusEl = document.getElementById('reflection-status');
+        const promptEl = document.getElementById('reflection-prompt');
+        if (!statusEl || !promptEl) return;
+
+        const todayKey = this.getDateKey(new Date());
+        const todayData = this.data[todayKey] || {};
+        const mood = todayData.mood;
+        const motivation = todayData.motivation;
+        const completedHabits = todayData.habits?.length || 0;
+        const totalHabits = this.habits.length;
+
+        if (!mood || !motivation) {
+            statusEl.textContent = 'Awaiting entry';
+            promptEl.textContent = 'Log today’s mood and motivation to receive a tailored reflection.';
+            return;
+        }
+
+        const completionPercent = totalHabits ? (completedHabits / totalHabits) * 100 : 0;
+
+        if (mood >= 8 && motivation >= 7) {
+            statusEl.textContent = 'Elevated';
+            promptEl.textContent = 'You’re thriving today! Channel this energy into a challenging habit or stretch goal.';
+        } else if (mood <= 4 && motivation <= 4) {
+            statusEl.textContent = 'Needs care';
+            promptEl.textContent = 'Take a breather. Consider a light habit or short walk to reset before tackling more.';
+        } else if (completionPercent >= 75) {
+            statusEl.textContent = 'Momentum building';
+            promptEl.textContent = 'Great consistency! Reflect on what worked today and plan a small reward for yourself.';
+        } else if (completionPercent > 0 && completionPercent < 75) {
+            statusEl.textContent = 'Keep going';
+            promptEl.textContent = 'You’ve made progress—keep the streak alive by finishing one more habit tonight.';
+        } else {
+            statusEl.textContent = 'Check-in logged';
+            promptEl.textContent = 'Mood and motivation noted. Consider adding at least one habit completion for momentum.';
+        }
+    }
+
     adjustMentalStateGridLayout(daysInMonth) {
         const grid = document.getElementById('mental-state-grid');
         const wrapper = document.querySelector('.mental-state-grid-wrapper');
@@ -672,13 +902,17 @@ class HabitTracker {
         const computedStyles = window.getComputedStyle(grid);
         const gap = parseFloat(computedStyles.gap) || 8;
         const totalGaps = Math.max(0, daysInMonth * gap);
-        const labelWidth = Math.min(160, Math.max(115, wrapperWidth * 0.1));
+        const minLabelWidth = 140;
+        const maxLabelWidth = 200;
+        const labelWidth = Math.min(maxLabelWidth, Math.max(minLabelWidth, wrapperWidth * 0.12));
         const paddingBuffer = 24;
         const availableWidth = wrapperWidth - labelWidth - totalGaps - paddingBuffer;
         const rawDayWidth = availableWidth / Math.max(1, daysInMonth);
+        const minDayWidth = 34;
+        const maxDayWidth = 50;
         const dayWidth = Number.isFinite(rawDayWidth)
-            ? Math.max(22, Math.min(52, rawDayWidth))
-            : 28;
+            ? Math.max(minDayWidth, Math.min(maxDayWidth, rawDayWidth))
+            : minDayWidth;
 
         const template = `${labelWidth}px repeat(${daysInMonth}, minmax(${dayWidth}px, 1fr))`;
         grid.style.gridTemplateColumns = template;
@@ -930,6 +1164,9 @@ class HabitTracker {
 
         // Render monthly stats grid
         this.renderMonthlyStatsGrid(year, monthStats);
+
+        // Render momentum strip
+        this.renderYearlyMomentum(monthStats);
     }
 
     renderMonthlyStatsGrid(year, monthStats) {
@@ -958,6 +1195,59 @@ class HabitTracker {
         });
         
         grid.innerHTML = html;
+    }
+
+    getMomentumStatus(progress) {
+        if (progress >= 80) return { label: 'Crushing it', tone: 'high' };
+        if (progress >= 50) return { label: 'On track', tone: 'mid' };
+        return { label: 'Warm up', tone: 'low' };
+    }
+
+    renderYearlyMomentum(monthStats) {
+        const bestNameEl = document.getElementById('best-month-name');
+        const bestScoreEl = document.getElementById('best-month-score');
+        const bestHelperEl = document.getElementById('best-month-helper');
+        const stripEl = document.getElementById('monthly-momentum-strip');
+
+        if (!bestNameEl || !bestScoreEl || !bestHelperEl || !stripEl) return;
+
+        if (!monthStats.length || this.habits.length === 0) {
+            bestNameEl.textContent = '—';
+            bestScoreEl.textContent = '0%';
+            bestHelperEl.textContent = 'Log habits to unlock highlights.';
+            stripEl.innerHTML = '<p class="momentum-empty">Track habits to see monthly momentum.</p>';
+            return;
+        }
+
+        const bestMonth = [...monthStats].sort((a, b) => b.progress - a.progress)[0];
+        const monthName = new Date(this.currentDate.getFullYear(), bestMonth.month, 1)
+            .toLocaleDateString('en-US', { month: 'long' });
+        bestNameEl.textContent = monthName;
+        bestScoreEl.textContent = `${bestMonth.progress.toFixed(0)}%`;
+        bestHelperEl.textContent = bestMonth.progress >= 75
+            ? 'This month sets the bar high—keep the streak alive!'
+            : 'Great start—aim to push this month into the 80% club.';
+
+        const chips = monthStats.map(stat => {
+            const label = new Date(this.currentDate.getFullYear(), stat.month, 1)
+                .toLocaleDateString('en-US', { month: 'short' });
+            const status = this.getMomentumStatus(stat.progress);
+            const progress = stat.progress.toFixed(0);
+            return `
+                <div class="momentum-chip momentum-${status.tone}">
+                    <div class="chip-header">
+                        <span>${label}</span>
+                        <strong>${progress}%</strong>
+                    </div>
+                    <div class="chip-bar">
+                        <div class="chip-bar-fill" style="width: ${stat.progress}%"></div>
+                    </div>
+                    <div class="chip-status">${status.label}</div>
+                </div>
+            `;
+        }).join('');
+
+        stripEl.innerHTML = chips;
     }
 
     renderSettings() {

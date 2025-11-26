@@ -14,31 +14,37 @@
   "data": {
     "2025-11-26": {
       "habits": [],
-      "mood": null,
-      "motivation": null
+      "mood": 2,
+      "motivation": 5
     },
     "2025-11-25": {
       "habits": [
+        1,
+        2
+      ],
+      "mood": 10,
+      "motivation": 9
+    },
+    "2025-11-24": {
+      "habits": [
+        2,
         1
       ],
       "mood": null,
       "motivation": null
     },
-    "2025-11-24": {
-      "habits": [],
-      "mood": null,
-      "motivation": null
-    },
     "2025-11-12": {
       "habits": [
-        1
+        1,
+        2
       ],
       "mood": null,
       "motivation": null
     },
     "2025-11-15": {
       "habits": [
-        1
+        1,
+        2
       ],
       "mood": 6,
       "motivation": null
@@ -52,6 +58,7 @@
     },
     "2025-11-21": {
       "habits": [
+        2,
         1
       ],
       "mood": null,
@@ -66,8 +73,8 @@
     },
     "2025-11-18": {
       "habits": [
-        1,
-        2
+        2,
+        1
       ],
       "mood": null,
       "motivation": null
@@ -90,7 +97,10 @@
       "motivation": 6
     },
     "2025-11-14": {
-      "habits": [],
+      "habits": [
+        1,
+        2
+      ],
       "mood": 5,
       "motivation": 9
     },
@@ -224,7 +234,84 @@
     },
     "2025-11-22": {
       "habits": [
+        2,
+        1
+      ],
+      "mood": null,
+      "motivation": null
+    },
+    "2025-11-23": {
+      "habits": [
+        1
+      ],
+      "mood": 8,
+      "motivation": 9
+    },
+    "2025-11-01": {
+      "habits": [
+        1,
         2
+      ],
+      "mood": null,
+      "motivation": null
+    },
+    "2025-11-02": {
+      "habits": [
+        2
+      ],
+      "mood": null,
+      "motivation": null
+    },
+    "2025-11-03": {
+      "habits": [
+        1,
+        2
+      ],
+      "mood": null,
+      "motivation": null
+    },
+    "2025-11-04": {
+      "habits": [
+        1
+      ],
+      "mood": null,
+      "motivation": null
+    },
+    "2025-11-05": {
+      "habits": [
+        2,
+        1
+      ],
+      "mood": null,
+      "motivation": null
+    },
+    "2025-11-06": {
+      "habits": [
+        1,
+        2
+      ],
+      "mood": null,
+      "motivation": null
+    },
+    "2025-11-08": {
+      "habits": [
+        1,
+        2
+      ],
+      "mood": null,
+      "motivation": null
+    },
+    "2025-11-09": {
+      "habits": [
+        1,
+        2
+      ],
+      "mood": null,
+      "motivation": null
+    },
+    "2025-11-13": {
+      "habits": [
+        1
       ],
       "mood": null,
       "motivation": null
