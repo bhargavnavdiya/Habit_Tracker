@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habit Tracker - Build Better Habits</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
+                <h1 class="logo">✨ Habit Tracker</h1>
+                <p class="tagline">Build better habits, one day at a time</p>
+            </div>
+            <nav class="nav-menu">
+                <button class="nav-item active" data-view="monthly">
+                    <span class="nav-icon">📅</span>
+                    <span>Monthly View</span>
+                </button>
+                <button class="nav-item" data-view="yearly">
+                    <span class="nav-icon">📊</span>
+                    <span>Yearly Stats</span>
+                </button>
+                <button class="nav-item" data-view="settings">
+                    <span class="nav-icon">⚙️</span>
+                    <span>Settings</span>
+                </button>
+            </nav>
+        </aside>
+        <button class="sidebar-fab" id="sidebar-fab">☰</button>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Monthly View -->
+            <div id="monthly-view" class="view active">
+                <div class="view-header">
+                    <div class="month-navigation">
+                        <button class="nav-btn" id="prev-month">←</button>
+                        <h2 id="current-month-year"></h2>
+                        <button class="nav-btn" id="next-month">→</button>
+                    </div>
+                    <div class="date-picker-container">
+                        <input type="month" id="month-picker" class="month-picker">
+                        <button class="btn-secondary" id="go-to-today">Today</button>
+                    </div>
+                </div>
+
+                <!-- Summary Cards -->
+                <div class="summary-cards">
+                    <div class="summary-card">
+                        <div class="card-label">Number of Habits</div>
+                        <div class="card-value" id="total-habits">10</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="card-label">Completed Habits</div>
+                        <div class="card-value" id="completed-habits">0</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="card-label">Today's Progress</div>
+                        <div class="card-value accent" id="progress-percent">0%</div>
+                    </div>
+                    <div class="summary-card progress-bar-card">
+                        <div class="card-label">Today's Progress Bar</div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" id="overall-progress-bar">
+                                <span class="progress-bar-label" id="progress-bar-label">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Habit Tracker Grid -->
+                <div class="tracker-section">
+                    <div class="section-header">
+                        <h3>My Habits</h3>
+                        <button class="btn-secondary" id="add-habit-btn">+ Add Habit</button>
+                    </div>
+                    <div class="tracker-grid" id="tracker-grid"></div>
+                </div>
+
+                <!-- Daily Progress Chart -->
+                <div class="chart-section">
+                    <h3>Daily Progress</h3>
+                    <canvas id="progress-chart"></canvas>
+                </div>
+
+                <!-- Mental State Section -->
+                <div class="mental-state-section">
+                    <h3>Mental State</h3>
+                    <div class="mental-state-grid-wrapper">
+                        <div class="mental-state-grid" id="mental-state-grid"></div>
+                    </div>
+                    <canvas id="mental-state-chart"></canvas>
+                </div>
+
+                <!-- Analysis Section -->
+                <div class="analysis-section">
+                    <h3>Habit Analysis</h3>
+                    <div class="analysis-table" id="analysis-table"></div>
+                </div>
+            </div>
+
+            <!-- Yearly View -->
+            <div id="yearly-view" class="view">
+                <div class="view-header">
+                    <h2>Yearly Statistics</h2>
+                    <div class="year-navigation">
+                        <button class="nav-btn" id="prev-year">←</button>
+                        <span id="current-year"></span>
+                        <button class="nav-btn" id="next-year">→</button>
+                    </div>
+                </div>
+                <div class="yearly-chart-container">
+                    <canvas id="yearly-chart"></canvas>
+                </div>
+                <div class="monthly-stats-grid" id="monthly-stats-grid"></div>
+            </div>
+
+            <!-- Settings View -->
+            <div id="settings-view" class="view">
+                <div class="view-header">
+                    <h2>Settings</h2>
+                </div>
+                <div class="settings-content">
+                    <div class="settings-section">
+                        <h3>Manage Habits</h3>
+                        <div id="habits-list"></div>
+                        <button class="btn-primary" id="add-habit-settings-btn">+ Add New Habit</button>
+                    </div>
+                    <div class="settings-section">
+                        <h3>Data Management</h3>
+                        <button class="btn-secondary" id="export-data-btn">Export Data</button>
+                        <button class="btn-secondary" id="import-data-btn">Import Data</button>
+                        <input type="file" id="import-file" accept=".json" style="display: none;">
+                        <button class="btn-danger" id="clear-data-btn">Clear All Data</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Habit Modal -->
+    <div id="add-habit-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Habit</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Habit Name</label>
+                    <input type="text" id="habit-name-input" placeholder="e.g., Wake up at 05:00">
+                </div>
+                <div class="form-group">
+                    <label>Emoji (optional)</label>
+                    <input type="text" id="habit-emoji-input" placeholder="⏰" maxlength="2">
+                </div>
+                <div class="form-group">
+                    <label>Daily Goal</label>
+                    <input type="number" id="habit-goal-input" value="1" min="1" max="1">
+                    <small>Times per day (default: 1)</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary modal-cancel">Cancel</button>
+                <button class="btn-primary" id="save-habit-btn">Add Habit</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
+

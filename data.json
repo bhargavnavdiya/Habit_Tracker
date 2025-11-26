@@ -1,0 +1,132 @@
+{
+  "habits": [
+    {
+      "id": 1,
+      "name": "Wakeup at 5:00",
+      "emoji": "⏰"
+    }
+  ],
+  "data": {
+    "2025-11-26": {
+      "habits": [],
+      "mood": null,
+      "motivation": null
+    },
+    "2025-11-25": {
+      "habits": [
+        1
+      ],
+      "mood": null,
+      "motivation": null
+    },
+    "2025-11-24": {
+      "habits": [],
+      "mood": null,
+      "motivation": null
+    },
+    "2025-11-12": {
+      "habits": [
+        1
+      ],
+      "mood": null,
+      "motivation": null
+    },
+    "2025-11-15": {
+      "habits": [
+        1
+      ],
+      "mood": 6,
+      "motivation": null
+    },
+    "2025-11-17": {
+      "habits": [
+        1
+      ],
+      "mood": null,
+      "motivation": null
+    },
+    "2025-11-21": {
+      "habits": [
+        1
+      ],
+      "mood": null,
+      "motivation": null
+    },
+    "2025-11-20": {
+      "habits": [
+        1
+      ],
+      "mood": null,
+      "motivation": null
+    },
+    "2025-11-18": {
+      "habits": [
+        1
+      ],
+      "mood": null,
+      "motivation": null
+    },
+    "2025-11-16": {
+      "habits": [],
+      "mood": null,
+      "motivation": null
+    },
+    "2025-11-10": {
+      "habits": [],
+      "mood": null,
+      "motivation": 4
+    },
+    "2025-11-11": {
+      "habits": [],
+      "mood": null,
+      "motivation": 6
+    },
+    "2025-11-14": {
+      "habits": [],
+      "mood": 5,
+      "motivation": 9
+    },
+    "2025-09-01": {
+      "habits": [
+        1
+      ],
+      "mood": null,
+      "motivation": null
+    },
+    "2025-09-05": {
+      "habits": [
+        1
+      ],
+      "mood": null,
+      "motivation": null
+    },
+    "2025-09-08": {
+      "habits": [
+        1
+      ],
+      "mood": null,
+      "motivation": null
+    },
+    "2025-09-10": {
+      "habits": [
+        1
+      ],
+      "mood": null,
+      "motivation": null
+    },
+    "2025-09-20": {
+      "habits": [
+        1
+      ],
+      "mood": null,
+      "motivation": null
+    },
+    "2025-09-17": {
+      "habits": [
+        1
+      ],
+      "mood": null,
+      "motivation": null
+    }
+  }
+}
